@@ -1,0 +1,289 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Stuart WooCommerce integration\n"
+"POT-Creation-Date: 2020-01-12 19:29+0100\n"
+"PO-Revision-Date: 2020-01-12 19:30+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: stuart-integration.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#: includes/apiStuart.php:57 includes/apiStuart.php:128
+msgid "For the delivery"
+msgstr "Nota para el repartidor"
+
+#: includes/apiStuart.php:57 includes/apiStuart.php:128
+msgid "Order ID"
+msgstr "ID de pedido"
+
+#: includes/apiStuart.php:57 includes/apiStuart.php:128
+msgid "Notes"
+msgstr "Notas"
+
+#: includes/apiStuart.php:197
+msgid "We can not find this drop off address"
+msgstr "No podemos encontrar esta dirección de entrega"
+
+#: includes/apiStuart.php:227
+msgid "This location is for delivery out of range or incorrect"
+msgstr "Esta ubicación para la entrega está fuera de rango o es incorrecta"
+
+#: includes/functions.php:12
+msgid "Stuart config page"
+msgstr "Página de configuración de Stuart"
+
+#: includes/functions.php:13 includes/stuart-admin-page.php:7
+msgid "Stuart Integration"
+msgstr "Integración Stuart"
+
+#: includes/functions.php:40
+msgid "Api Settings Saved"
+msgstr "Configuración de Api guardada"
+
+#: includes/functions.php:54
+msgid "Google Api Settings Saved"
+msgstr "Configuración de Google Api guardada"
+
+#: includes/functions.php:68
+msgid "HERE Api Settings Saved"
+msgstr "Configuración de HERE Api guardada"
+
+#: includes/functions.php:115
+msgid "Pick Up Settings Saved"
+msgstr "Configuración de recogida guardados"
+
+#: includes/stuart-admin-page.php:8
+msgid "Welcome to Stuart integration configuration"
+msgstr "Bienvenido a la configuración de integración de Stuart"
+
+#: includes/stuart-admin-page.php:14
+msgid ""
+"Please enter the corresponding keys to your Stuart account in these text "
+"fields."
+msgstr ""
+"Introduzca las claves correspondientes a su cuenta Stuart en estos campos de "
+"texto."
+
+#: includes/stuart-admin-page.php:16
+msgid "Please select environment"
+msgstr "Por favor seleccione el entorno"
+
+#: includes/stuart-admin-page.php:18
+msgid "Sandbox"
+msgstr "Pruebas"
+
+#: includes/stuart-admin-page.php:19
+msgid "Production"
+msgstr "Producción"
+
+#: includes/stuart-admin-page.php:23
+msgid "Stuart API KEY"
+msgstr "Stuart API KEY"
+
+#: includes/stuart-admin-page.php:26
+msgid "Stuart SECRET KEY"
+msgstr "Stuart SECRET KEY"
+
+#: includes/stuart-admin-page.php:30 includes/stuart-admin-page.php:133
+#: includes/stuart-admin-page.php:158 includes/stuart-admin-page.php:181
+#: includes/stuart-admin-page.php:204
+msgid "Submit"
+msgstr "Guardar"
+
+#: includes/stuart-admin-page.php:38
+msgid "Pick up data location"
+msgstr "Datos de localización de la recogida"
+
+#: includes/stuart-admin-page.php:39
+msgid "Please, place here the pick up location"
+msgstr "Por favor, coloque aquí el lugar de recogida"
+
+#: includes/stuart-admin-page.php:43
+msgid "Restaurant pick up address"
+msgstr "Dirección de recogida en el restaurante"
+
+#: includes/stuart-admin-page.php:49 includes/stuart-admin-page.php:50
+msgid "First name"
+msgstr "Nombre"
+
+#: includes/stuart-admin-page.php:53 includes/stuart-admin-page.php:54
+msgid "Last name"
+msgstr "Apellidos"
+
+#: includes/stuart-admin-page.php:58 includes/stuart-admin-page.php:59
+msgid "Company"
+msgstr "Empresa"
+
+#: includes/stuart-admin-page.php:62 includes/stuart-admin-page.php:63
+msgid "Email"
+msgstr "Email"
+
+#: includes/stuart-admin-page.php:68 includes/stuart-admin-page.php:69
+#: includes/stuart-admin-page.php:70 includes/stuart-admin-page.php:71
+msgid "Shop"
+msgstr "Tienda"
+
+#: includes/stuart-admin-page.php:77 includes/stuart-admin-page.php:91
+#: includes/stuart-admin-page.php:104 includes/stuart-admin-page.php:117
+msgid "Address It must be an address formatted by Google "
+msgstr "Debe ser una dirección formateada por Google "
+
+#: includes/stuart-admin-page.php:78
+msgid "Enter a location shop 1"
+msgstr "Escribe la localización de la tienda 1"
+
+#: includes/stuart-admin-page.php:81 includes/stuart-admin-page.php:95
+#: includes/stuart-admin-page.php:108 includes/stuart-admin-page.php:121
+msgid "Phone"
+msgstr "Teléfono"
+
+#: includes/stuart-admin-page.php:82
+msgid "Phone shop 1"
+msgstr "Teléfono tienda 1"
+
+#: includes/stuart-admin-page.php:85 includes/stuart-admin-page.php:99
+#: includes/stuart-admin-page.php:112 includes/stuart-admin-page.php:125
+msgid ""
+"Add details for the courier (floor number, door, local, other information, "
+"etc.)"
+msgstr ""
+"Añadir detalles para el mensajero (número de piso, puerta, local, otra "
+"información, etc.)"
+
+#: includes/stuart-admin-page.php:92
+msgid "Enter location shop 2"
+msgstr "Escribe la localización de la tienda 2"
+
+#: includes/stuart-admin-page.php:96
+msgid "Phone shop 2"
+msgstr "Teléfono tienda 2"
+
+#: includes/stuart-admin-page.php:105
+msgid "Enter location shop 3"
+msgstr "Escribe la localización de la tienda 3"
+
+#: includes/stuart-admin-page.php:109
+msgid "Phone shop 3"
+msgstr "Teléfono tienda 3"
+
+#: includes/stuart-admin-page.php:118
+msgid "Enter location shop 4"
+msgstr "Escribe la localización de la tienda 4"
+
+#: includes/stuart-admin-page.php:122
+msgid "Phone shop 4"
+msgstr "Teléfono tienda 4"
+
+#: includes/stuart-admin-page.php:142
+msgid "Drop off data location"
+msgstr "Datos de localización de la entrega"
+
+#: includes/stuart-admin-page.php:146
+msgid "Woocommerce Address"
+msgstr "Dirección de Woocommerce"
+
+#: includes/stuart-admin-page.php:152
+msgid "Billing Address"
+msgstr "Dirección de facturación"
+
+#: includes/stuart-admin-page.php:153
+msgid "Shipping Address"
+msgstr "Dirección de envío"
+
+#: includes/stuart-admin-page.php:167
+msgid "GOOGLE API"
+msgstr "GOOGLE API"
+
+#: includes/stuart-admin-page.php:171
+msgid "Please place here your Google API key"
+msgstr "Por favor, coloque aquí su clave de API de Google"
+
+#: includes/stuart-admin-page.php:175 includes/stuart-admin-page.php:198
+msgid "You can find here your "
+msgstr "Puedes encontrar aquí tu "
+
+#: includes/stuart-admin-page.php:175 includes/stuart-admin-page.php:177
+msgid "Google API key"
+msgstr "Google API key"
+
+#: includes/stuart-admin-page.php:189
+msgid "HERE MAPS API"
+msgstr "HERE MAPS API"
+
+#: includes/stuart-admin-page.php:190
+msgid ""
+"Alternative to google maps to perform distance calculations between stores "
+"and calculate the shortest distance between the customer's address and the "
+"store that will place the order"
+msgstr ""
+"Alternativa a los mapas de Google para realizar cálculos de distancia entre "
+"tiendas y calcular la distancia más corta entre la dirección del cliente y "
+"la tienda que realizará el pedido"
+
+#: includes/stuart-admin-page.php:194
+msgid "Please place here your HERE API key"
+msgstr "Por favor, coloque aquí su clave de API HERE"
+
+#: includes/stuart-admin-page.php:198 includes/stuart-admin-page.php:200
+msgid "HERE API key"
+msgstr "HERE API key"
+
+#: includes/woo-functions.php:47
+msgid "Stuart: "
+msgstr "Stuart: "
+
+#: includes/woo-functions.php:170
+msgid "Shipping Fee"
+msgstr "Gastos de envío"
+
+#: includes/woo-functions.php:184
+msgid "Stuart"
+msgstr "Stuart"
+
+#. Plugin Name of the plugin/theme
+msgid "Stuart WooCommerce integration"
+msgstr "Integración con Stuart WooCommerce"
+
+#. Description of the plugin/theme
+msgid "Stuart integration (express shipping) with woocommerce wordpress"
+msgstr "Integración Stuart (envío exprés) con woocommerce wordpress"
+
+#. Author of the plugin/theme
+msgid "Jabit Web Developer"
+msgstr "Jabit Web Developer"
+
+#. Author URI of the plugin/theme
+msgid "https://ja-bit.com"
+msgstr "https://ja-bit.com"
+
+#~ msgid "Address"
+#~ msgstr "Dirección"
+
+#~ msgid "You do not have sufficient permissions to access this page."
+#~ msgstr "No tienes suficientes permisos para acceder a esta página."
+
+#~ msgid "Drop Off Settings Saved"
+#~ msgstr "Configuración de entrega guardada"
+
+#~ msgid "Google API KEY"
+#~ msgstr "Google API KEY"
+
+#~ msgid "HERE API KEY"
+#~ msgstr "HERE API KEY"
+
+#~ msgid "Select Woocommerce Address"
+#~ msgstr "Seleccionar dirección de Woocommerce"

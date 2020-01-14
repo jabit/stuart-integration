@@ -1,0 +1,143 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Stuart WooCommerce integration\n"
+"POT-Creation-Date: 2019-12-30 18:58+0100\n"
+"PO-Revision-Date: 2019-12-30 18:57+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: stuart-integration.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#: includes/functions.php:42
+msgid "Api Settings Saved"
+msgstr ""
+
+#: includes/functions.php:74
+msgid "Pick Up Settings Saved"
+msgstr ""
+
+#: includes/functions.php:94
+msgid "Drop Off Settings Saved"
+msgstr ""
+
+#: includes/stuart-admin-page.php:8
+msgid "Stuart Integration"
+msgstr ""
+
+#: includes/stuart-admin-page.php:9
+msgid "Welcome to Stuart integration configuration"
+msgstr ""
+
+#: includes/stuart-admin-page.php:15
+msgid ""
+"Please enter the corresponding keys to your Stuart account in these text "
+"fields."
+msgstr ""
+
+#: includes/stuart-admin-page.php:17
+msgid "Stuart API KEY"
+msgstr ""
+
+#: includes/stuart-admin-page.php:20
+msgid "Stuart SECRET KEY"
+msgstr ""
+
+#: includes/stuart-admin-page.php:24 includes/stuart-admin-page.php:73
+#: includes/stuart-admin-page.php:97
+msgid "Submit"
+msgstr ""
+
+#: includes/stuart-admin-page.php:32
+msgid "Pick up data location"
+msgstr ""
+
+#: includes/stuart-admin-page.php:33
+msgid "Please, place here the pick up location"
+msgstr ""
+
+#: includes/stuart-admin-page.php:37
+msgid "Restaurant pick up address"
+msgstr ""
+
+#: includes/stuart-admin-page.php:43 includes/stuart-admin-page.php:44
+msgid "First name"
+msgstr ""
+
+#: includes/stuart-admin-page.php:47 includes/stuart-admin-page.php:48
+msgid "Last name"
+msgstr ""
+
+#: includes/stuart-admin-page.php:52 includes/stuart-admin-page.php:53
+msgid "Company"
+msgstr ""
+
+#: includes/stuart-admin-page.php:56 includes/stuart-admin-page.php:57
+msgid "Address"
+msgstr ""
+
+#: includes/stuart-admin-page.php:56
+msgid "It must be an address formatted by Google "
+msgstr ""
+
+#: includes/stuart-admin-page.php:60 includes/stuart-admin-page.php:61
+msgid "Phone"
+msgstr ""
+
+#: includes/stuart-admin-page.php:64 includes/stuart-admin-page.php:65
+msgid "Email"
+msgstr ""
+
+#: includes/stuart-admin-page.php:68
+msgid ""
+"Add details for the courier (floor number, door, other information, etc.)"
+msgstr ""
+
+#: includes/stuart-admin-page.php:80
+msgid "Drop off data location"
+msgstr ""
+
+#: includes/stuart-admin-page.php:84
+msgid "Woocommerce Address"
+msgstr ""
+
+#: includes/stuart-admin-page.php:90
+msgid "Select Woocommerce Address"
+msgstr ""
+
+#: includes/stuart-admin-page.php:91
+msgid "Billing Address"
+msgstr ""
+
+#: includes/stuart-admin-page.php:92
+msgid "Shipping Address"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Stuart WooCommerce integration"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Stuart integration (express shipping) with woocommerce wordpress"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Jabit Web Developer"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://ja-bit.com"
+msgstr ""

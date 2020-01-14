@@ -1,0 +1,38 @@
+/*--------------------------------------------------------------
+ Common
+--------------------------------------------------------------*/
+.wrap_stuartform {
+  margin: 0 auto 2em;
+  max-width: 96%; }
+
+
+.wrap_stuartform .input-group{
+  margin-top: 15px;
+}
+.mobile.wrap_stuartform {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%; }
+
+.aewidget input[type=text],
+.aewidget select {
+  border-width: 1px;
+  border-style: solid; }
+
+svg.icon {
+  display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  position: relative;
+  top: -0.0625em;
+  vertical-align: middle;
+  width: 1em; }
+
+@font-face {
+  font-family: star;
+  src: url(../fonts/star.eot);
+  src: url(../fonts/star.eot?#iefix) format("embedded-opentype"), url(../fonts/star.woff) format("woff"), url(../fonts/star.ttf) format("truetype"), url(../fonts/star.svg#star) format("svg");
+  font-weight: 400;
+  font-style: normal; }
+
+/*# sourceMappingURL=restaurant-booking.css.map */
