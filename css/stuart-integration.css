@@ -36,3 +36,13 @@ svg.icon {
   font-style: normal; }
 
 /*# sourceMappingURL=restaurant-booking.css.map */
+.wrap_stuartform small{
+  display: inline;
+  width: auto;
+  float: none;
+}
+
+.wrap_stuartform .card{
+  max-width: 670px;
+}
+

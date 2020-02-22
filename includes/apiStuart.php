@@ -13,7 +13,7 @@ class ApiStuart
     public $google_key;
 
     public function __construct() {
-        
+
         //PHP Stuart integration
         $this->stuart_key = get_option('stuart_api_key');
         $this->stuart_secret = get_option('stuart_secret_key');
@@ -32,7 +32,10 @@ class ApiStuart
         $this->google_key = get_option('stuart_google_key');
     }
 
-    public function stuart_create_job($order, $item_data){
+    public function stuart_create_job($order_id){
+
+        if ( !$order_id ) return;
+        $order = wc_get_order( $order_id );
 
         $pickupAt = null;
         $now = new \DateTime('now', new DateTimeZone(get_option('timezone_string') != null ? get_option('timezone_string') : date_default_timezone_get()));
@@ -52,15 +55,43 @@ class ApiStuart
             ->setContactEmail(get_option( 'pickup_email'))
             ->setPickupAt($pickupAt);
 
+        $commentDelivery = null;
+        $commentOrderId = null;
+        $commentNotes = null;
+        $commentPhone = null;
+        $comment = null;
+        if(!empty($order->get_shipping_address_2()))
+            $comment .= __('For the delivery', 'stuart-integration').': '.$order->get_shipping_address_2().', ';
+        if(!empty($order->get_id()))
+            $comment .= __('Order ID', 'stuart-integration').': '.$order->get_id().', ';
+        if(!empty($order->get_billing_phone()))
+            $comment .= __('Customer phone', 'stuart-integration').': '.$order->get_billing_phone().', ';
+        if(!empty($order->get_customer_note()))
+            $comment .= __('Notes', 'stuart-integration').': '.$order->get_customer_note();
+
+        //Show order in stuart comment
+        $item_data = null;
+        $item_data .= __('LINK TO WOO ORDER', 'stuart-integration').': '.admin_url('post.php?post='.$order_id.'&action=edit');
+        $item_data .= " | ";
+        $item_data .= __('SHOP ORDER', 'stuart-integration').': ';
+        foreach ( $order->get_items() as $key => $item ) {
+
+            if(end($order->get_items()) == $item){
+                $item_data .= $item->get_data()['quantity'].' x '.$item->get_data()['name'].PHP_EOL;
+            }else{
+                $item_data .= $item->get_data()['quantity'].' x '.$item->get_data()['name'].', '.PHP_EOL;
+            }
+        }
+
         $this->job->addDropOff($this->formatted_shipping_address($order))
             ->setPackageType('medium')
-            ->setComment(__('For the delivery', 'stuart-integration').': '.$order->get_shipping_address_2().', '.__('Order ID', 'stuart-integration').': '.$order->get_id().', '.__('Notes', 'stuart-integration').': '.$order->get_customer_note())
+            ->setComment($comment)
             ->setContactFirstName($order->get_shipping_first_name())
             ->setContactLastName($order->get_shipping_last_name())
             ->setContactPhone($order->get_billing_phone())
             ->setContactEmail($order->get_billing_email())
-            ->setPackageDescription('HEALTHY POKE: '.$item_data['name'])
-            ->setClientReference($order->get_customer_id().':'.$order->get_id());
+            ->setPackageDescription($item_data)
+            ->setClientReference($order->get_customer_id().'-'.$order->get_id());
         //->setClientReference($order->get_customer_id());
         //->setDropoffAt($dropoffAt);
 
@@ -76,24 +107,48 @@ class ApiStuart
         return $result;
     }
 
+    public function splitString($cadena, $longitud) {
+        // Inicializamos las variables
+        $contador = 0;
+        $texto = '';
+
+        // Cortamos la cadena por los espacios
+        $arrayTexto = explode(' ', $cadena);
+
+        // Reconstruimos la cadena palabra a palabra mientras no sobrepasemos la longitud maxima
+        while($longitud >= strlen($texto) + strlen($arrayTexto[$contador])) {
+            $texto .= ' '.$arrayTexto[$contador];
+            $contador++;
+        }
+
+        //añadimos los ... al final de la cadena si esta era mas larga que la longitud maximo
+        if(strlen($cadena)>$longitud){
+            $texto .= '...';
+        }
+
+        return trim($texto);
+    }
+
     public function formatted_shipping_address($order)
     {
         return $order->get_shipping_address_1() . ', ' .
-                //$order->get_shipping_address_2() . ' ' .
-                $order->get_shipping_postcode()  . ', ' .
-                $order->get_shipping_city()     . ' ' .
-                $order->get_shipping_state();
+            //$order->get_shipping_address_2() . ' ' .
+            $order->get_shipping_postcode()  . ', ' .
+            $order->get_shipping_city()     . ' ' .
+            $order->get_shipping_state();
     }
 
-    public function stuart_validation($order) {
+    public function stuart_validation($order_id) {
 
         global $woocommerce;
+        if ( !$order_id ) return;
+        $order = wc_get_order( $order_id );
 
         $addressTo = $woocommerce->customer->get_shipping_address_1() . ', ' .
-                    //$woocommerce->customer->get_shipping_address_2() . ' ' .
-                    $woocommerce->customer->get_shipping_postcode()  . ', ' .
-                    $woocommerce->customer->get_shipping_city()     . ' ' .
-                    $woocommerce->customer->get_shipping_state();
+            //$woocommerce->customer->get_shipping_address_2() . ' ' .
+            $woocommerce->customer->get_shipping_postcode()  . ', ' .
+            $woocommerce->customer->get_shipping_city()     . ' ' .
+            $woocommerce->customer->get_shipping_state();
 
         //Validar direcciones
         $validateAddress = $this->httpClient->performGet('/v2/addresses/validate', ['address' => $addressTo, 'type' => 'delivering']);
@@ -149,6 +204,63 @@ class ApiStuart
         );
     }
 
+    public function stuart_address_validation_without_order_id($address) {
+
+
+        //Validar direcciones
+        $validateAddress = $this->httpClient->performGet('/v2/addresses/validate', ['address' => $address, 'type' => 'delivering']);
+
+        if(!$validateAddress->success()){
+            //return $validateAddress;
+            return array(
+                'success' => false,
+                'result' => __(json_decode($validateAddress->getBody())->message, 'stuart-integration')
+            );
+        }
+
+        /*
+        $resultCloser = $this->calculate_closer_shop_from_drop_off($address);
+
+        if(!$resultCloser['success']){
+            return array(
+                'success' => false,
+                'result' => __($resultCloser['result'], 'stuart-integration')
+            );
+        }
+
+        $this->client = new \Stuart\Client($this->httpClient);
+        $this->job = new \Stuart\Job();
+
+        //validar Job
+        //TODO cambiar a $resultCloser['closer']
+        $this->job->addPickup(get_option('pickup_address_'.$resultCloser['address']));
+
+        //$woocommerce->customer->get_shipping_address_2()
+        $this->job->addDropOff($address)
+            ->setPackageType('medium')
+            //->setComment(__('For the delivery', 'stuart-integration').': '.$woocommerce->customer->get_shipping_address_2().', '.__('Order ID', 'stuart-integration').': '.$order->get_id().', '.__('Notes', 'stuart-integration').': '.$order->get_customer_note())
+            ->setContactFirstName($address['shipping_first_name'])
+            ->setContactLastName($address['shipping_last_name'])
+            ->setContactPhone($address['billing_phone'])
+            ->setContactEmail($address['billing_email'])
+            ->setClientReference('Validating: check address');
+
+        $result = $this->client->validateJob($this->job);
+
+        if(!empty($result->error)){
+            return array(
+                'success' => false,
+                'result' => __($result->message, 'stuart-integration')
+            );
+        }
+*/
+        return array(
+            'success' => true,
+            'result' => __('Address valid', 'stuart-integration')
+        );
+
+    }
+
     public function calculate_closer_shop_from_drop_off($addressTo){
 
         $addressesFromJson = null;
@@ -166,25 +278,32 @@ class ApiStuart
         }
 
         if(!empty($this->here_key)){
-            //Calculate distance with GOOGLE;
+
+            //Calculate distance with HERE;
             foreach($addressesFrom as $key => $addressFrom){
-                $calculateDistance[$key] = $this->getHereDistance($addressFrom, $addressTo);
-                if(!is_numeric($calculateDistance[$key])){
-                    return array(
-                        'success' => false,
-                        'result' => __($calculateDistance[$key], 'stuart-integration')
-                    );
+                $addressValidate = $this->validateAddress($addressFrom);
+                if(isset($addressValidate['success']) && $addressValidate['success']){
+                    $calculateDistance[$key] = $this->getHereDistance($addressFrom, $addressTo);
+                    if(!is_numeric($calculateDistance[$key])){
+                        return array(
+                            'success' => false,
+                            'result' => __($calculateDistance[$key], 'stuart-integration')
+                        );
+                    }
                 }
             }
         }else{
             //Calculate distance with GOOGLE;
             foreach($addressesFrom as $key => $addressFrom){
-                $calculateDistance[$key] = $this->getGoogleDistance($addressFrom, $addressTo, "K");
-                if(!is_numeric($calculateDistance[$key])){
-                    return array(
-                        'success' => false,
-                        'result' => __($calculateDistance[$key], 'stuart-integration')
-                    );
+                $addressValidate = $this->validateAddress($addressFrom);
+                if(isset($addressValidate['success']) && $addressValidate['success']){
+                    $calculateDistance[$key] = $this->getGoogleDistance($addressFrom, $addressTo, "K");
+                    if(!is_numeric($calculateDistance[$key])){
+                        return array(
+                            'success' => false,
+                            'result' => __($calculateDistance[$key], 'stuart-integration')
+                        );
+                    }
                 }
             }
         }
@@ -208,15 +327,45 @@ class ApiStuart
         );
     }
 
-    public function stuart_get_address_to( $woocommerce ) {
+    public function validateAddress($address){
 
+        //Validar direcciones
+        $validateAddress = $this->httpClient->performGet('/v2/addresses/validate', ['address' => $address, 'type' => 'delivering']);
+
+        if(!$validateAddress->success()){
+            return array(
+                'success' => false,
+                'result' => __("This location is for delivery out of range or incorrect", 'stuart-integration')
+            );
+        }
+
+        return array(
+            'success' => true
+        );
+    }
+
+    public function stuart_get_address_to($address) {
+
+        global $woocommerce;
         $_SESSION['pickup_closer'] = null;
 
-        $addressTo = $woocommerce->customer->get_shipping_address_1() . ', ' .
-                    //$woocommerce->customer->get_shipping_address_2() . ' ' .
-                    $woocommerce->customer->get_shipping_postcode()  . ', ' .
-                    $woocommerce->customer->get_shipping_city()     . ' ' .
-                    $woocommerce->customer->get_shipping_state();
+        $addressTo = null;
+
+        if($address){
+            $ship = 'billing';
+            if(isset($address['ship_to_different_address']) && $address['ship_to_different_address']){
+                $ship = 'shipping';
+            }
+            $addressTo =  $address[$ship.'_address_1'] . ', ' .
+                $address[$ship.'_postcode']  . ', ' .
+                $address[$ship.'_city']     . ' ' .
+                $address[$ship.'_state'];
+        }else{
+            $addressTo = $woocommerce->customer->get_shipping_address_1() . ', ' .
+                $woocommerce->customer->get_shipping_postcode()  . ', ' .
+                $woocommerce->customer->get_shipping_city()     . ' ' .
+                $woocommerce->customer->get_shipping_state();
+        }
 
         //Validar direcciones
         $validateAddress = $this->httpClient->performGet('/v2/addresses/validate', ['address' => $addressTo, 'type' => 'delivering']);
@@ -234,6 +383,19 @@ class ApiStuart
         );
     }
 
+    /*
+    function order_review_format_shipping_address($address)
+    {
+        $ship = 'billing';
+        if(isset($address['ship_to_different_address']) && $address['ship_to_different_address']){
+            $ship = 'shipping';
+        }
+        return $address[$ship.'_address_1'] . ', ' .
+            $address[$ship.'_postcode']  . ', ' .
+            $address[$ship.'_city']     . ' ' .
+            $address[$ship.'_state'];
+    }
+    */
     /**
      *
      * Author: CodexWorld
@@ -283,24 +445,29 @@ class ApiStuart
 
     public function getHereDistance($addressFrom, $addressTo){
 
-        //$auth1 = file_get_contents ( "https://geocoder.ls.hereapi.com/6.2/geocode.json?gen=9&apiKey=" . urlencode ( $this->here_key));
-        $auth2 = json_decode ( file_get_contents ( "https://geocoder.ls.hereapi.com/6.2/geocode.json?gen=9&apiKey=" . urlencode ( $this->here_key) . "&searchtext=" . urlencode ( $addressTo)), true);
+        $addressToJson = json_decode(file_get_contents("https://geocoder.ls.hereapi.com/6.2/geocode.json?searchtext=" . urlencode ( $addressTo)."&gen=9&apiKey=" . urlencode ( $this->here_key)), true);
 
-        if(isset($auth2["Response"]) && !empty($auth2["Response"])){
-            $addressToJson = json_decode ( file_get_contents ( "https://geocoder.ls.hereapi.com/6.2/geocode.json?gen=9&apiKey=" . urlencode ( $this->here_key) . "&searchtext=" . urlencode ( $addressTo)), true);
+        if(isset($addressToJson["Response"]["View"][0]) && !empty($addressToJson["Response"]["View"][0])){
 
             $lonAdressTo = $addressToJson["Response"]["View"][0]["Result"][0]["Location"]["DisplayPosition"]["Longitude"];
             $latAdressTo = $addressToJson["Response"]["View"][0]["Result"][0]["Location"]["DisplayPosition"]["Latitude"];
 
-            $addressesFromJson = json_decode ( file_get_contents ( "https://geocoder.ls.hereapi.com/6.2/geocode.json?gen=9&apiKey=" . urlencode ( $this->here_key) . "&searchtext=" . urlencode ( $addressFrom)), true);
-            $lonAdressFrom = $addressesFromJson["Response"]["View"][0]["Result"][0]["Location"]["DisplayPosition"]["Longitude"];
-            $latAdressFrom = $addressesFromJson["Response"]["View"][0]["Result"][0]["Location"]["DisplayPosition"]["Latitude"];
+            $addressesFromJson = json_decode(file_get_contents("https://geocoder.ls.hereapi.com/6.2/geocode.json?searchtext=" . urlencode ( $addressFrom)."&gen=9&apiKey=" . urlencode ( $this->here_key)), true);
 
-            $route = json_decode ( file_get_contents ("https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=" . urlencode($this->here_key) . "&waypoint0=geo!" . urlencode($latAdressTo) . "," . urlencode($lonAdressTo) . "&waypoint1=geo!" . urlencode($latAdressFrom) . "," . urlencode($lonAdressFrom) . "&routeattributes=wp,sm,sh,sc&mode=fastest;bicycle;motorway:-2", true));
+            if(isset($addressesFromJson["Response"]["View"][0]) && !empty($addressesFromJson["Response"]["View"][0])) {
 
-            return $route->response->route[0]->summary->distance;
+                $lonAdressFrom = $addressesFromJson["Response"]["View"][0]["Result"][0]["Location"]["DisplayPosition"]["Longitude"];
+                $latAdressFrom = $addressesFromJson["Response"]["View"][0]["Result"][0]["Location"]["DisplayPosition"]["Latitude"];
+
+                $route = json_decode(file_get_contents("https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=" . urlencode($this->here_key) . "&waypoint0=geo!" . urlencode($latAdressTo) . "," . urlencode($lonAdressTo) . "&waypoint1=geo!" . urlencode($latAdressFrom) . "," . urlencode($lonAdressFrom) . "&routeattributes=sm&mode=fastest;bicycle;motorway:-2"), true);
+
+                return $route['response']['route'][0]['summary']['distance'];
+
+            }else{
+                return _e( 'Drop off address incorrect', 'stuart-integration' );
+            }
         }else{
-            return "HERE API KEY incorrect";
+            return _e( 'Pickup address incorrect', 'stuart-integration' );
         }
     }
 }

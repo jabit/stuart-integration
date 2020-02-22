@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Stuart WooCommerce integration\n"
-"POT-Creation-Date: 2020-01-12 19:29+0100\n"
-"PO-Revision-Date: 2020-01-12 19:30+0100\n"
+"POT-Creation-Date: 2020-02-22 12:40+0100\n"
+"PO-Revision-Date: 2020-02-22 12:41+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: stuart-integration.php\n"
@@ -22,25 +22,50 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.min.js\n"
 "X-Poedit-SearchPathExcluded-1: vendor\n"
 
-#: includes/apiStuart.php:57 includes/apiStuart.php:128
+#: includes/apiStuart.php:64 includes/apiStuart.php:183
 msgid "For the delivery"
 msgstr "Nota para el repartidor"
 
-#: includes/apiStuart.php:57 includes/apiStuart.php:128
+#: includes/apiStuart.php:66 includes/apiStuart.php:183
 msgid "Order ID"
 msgstr "ID de pedido"
 
-#: includes/apiStuart.php:57 includes/apiStuart.php:128
+#: includes/apiStuart.php:68
+msgid "Customer phone"
+msgstr "Teléfono del cliente"
+
+#: includes/apiStuart.php:70 includes/apiStuart.php:183
 msgid "Notes"
 msgstr "Notas"
 
-#: includes/apiStuart.php:197
+#: includes/apiStuart.php:74
+msgid "LINK TO WOO ORDER"
+msgstr "ENLACE AL PEDIDO EN WOO"
+
+#: includes/apiStuart.php:76
+msgid "SHOP ORDER"
+msgstr "PEDIDO DE TIENDA"
+
+#: includes/apiStuart.php:259
+msgid "Address valid"
+msgstr "Dirección válida"
+
+#: includes/apiStuart.php:316
 msgid "We can not find this drop off address"
 msgstr "No podemos encontrar esta dirección de entrega"
 
-#: includes/apiStuart.php:227
+#: includes/apiStuart.php:338 includes/apiStuart.php:376
+#: includes/woo-functions.php:259
 msgid "This location is for delivery out of range or incorrect"
 msgstr "Esta ubicación para la entrega está fuera de rango o es incorrecta"
+
+#: includes/apiStuart.php:467
+msgid "Drop off address incorrect"
+msgstr "Dirección de entrega incorrecta"
+
+#: includes/apiStuart.php:470
+msgid "Pickup address incorrect"
+msgstr "Dirección de recogida incorrecta"
 
 #: includes/functions.php:12
 msgid "Stuart config page"
@@ -54,15 +79,48 @@ msgstr "Integración Stuart"
 msgid "Api Settings Saved"
 msgstr "Configuración de Api guardada"
 
-#: includes/functions.php:54
+#: includes/functions.php:62
+msgid "Shipping Fee Settings Saved"
+msgstr "Ajustes de la tarifa de envío guardados"
+
+#: includes/functions.php:76
 msgid "Google Api Settings Saved"
 msgstr "Configuración de Google Api guardada"
 
-#: includes/functions.php:68
+#: includes/functions.php:90
 msgid "HERE Api Settings Saved"
 msgstr "Configuración de HERE Api guardada"
 
-#: includes/functions.php:115
+#: includes/functions.php:104
+msgid "Clickatell Api Settings Saved"
+msgstr "Configuración de Clickatell Api guardada"
+
+#: includes/functions.php:141 includes/functions.php:144
+#: includes/functions.php:147 includes/functions.php:150
+msgid "NOT SAVED"
+msgstr "NO GUARDADO"
+
+#: includes/functions.php:141
+msgid "Pick Up Shop 1 address is for delivery out of range or incorrect"
+msgstr ""
+"La dirección de recogida dela tienda 1 está fuera de rango o es incorrecta"
+
+#: includes/functions.php:144
+msgid "Pick Up Shop 2 address is for delivery out of range or incorrect"
+msgstr ""
+"La dirección de recogida dela tienda 2 está fuera de rango o es incorrecta"
+
+#: includes/functions.php:147
+msgid "Pick Up Shop 3 address is for delivery out of range or incorrect"
+msgstr ""
+"La dirección de recogida dela tienda 3 está fuera de rango o es incorrecta"
+
+#: includes/functions.php:150
+msgid "Pick Up Shop 4 address is for delivery out of range or incorrect"
+msgstr ""
+"La dirección de recogida dela tienda 4 está fuera de rango o es incorrecta"
+
+#: includes/functions.php:173
 msgid "Pick Up Settings Saved"
 msgstr "Configuración de recogida guardados"
 
@@ -71,6 +129,10 @@ msgid "Welcome to Stuart integration configuration"
 msgstr "Bienvenido a la configuración de integración de Stuart"
 
 #: includes/stuart-admin-page.php:14
+msgid "Stuart API"
+msgstr "Stuart API"
+
+#: includes/stuart-admin-page.php:17
 msgid ""
 "Please enter the corresponding keys to your Stuart account in these text "
 "fields."
@@ -78,85 +140,114 @@ msgstr ""
 "Introduzca las claves correspondientes a su cuenta Stuart en estos campos de "
 "texto."
 
-#: includes/stuart-admin-page.php:16
+#: includes/stuart-admin-page.php:19
 msgid "Please select environment"
 msgstr "Por favor seleccione el entorno"
 
-#: includes/stuart-admin-page.php:18
+#: includes/stuart-admin-page.php:21
 msgid "Sandbox"
 msgstr "Pruebas"
 
-#: includes/stuart-admin-page.php:19
+#: includes/stuart-admin-page.php:22
 msgid "Production"
 msgstr "Producción"
 
-#: includes/stuart-admin-page.php:23
+#: includes/stuart-admin-page.php:26
 msgid "Stuart API KEY"
 msgstr "Stuart API KEY"
 
-#: includes/stuart-admin-page.php:26
+#: includes/stuart-admin-page.php:29
 msgid "Stuart SECRET KEY"
 msgstr "Stuart SECRET KEY"
 
-#: includes/stuart-admin-page.php:30 includes/stuart-admin-page.php:133
-#: includes/stuart-admin-page.php:158 includes/stuart-admin-page.php:181
-#: includes/stuart-admin-page.php:204
+#: includes/stuart-admin-page.php:33 includes/stuart-admin-page.php:61
+#: includes/stuart-admin-page.php:170 includes/stuart-admin-page.php:195
+#: includes/stuart-admin-page.php:218 includes/stuart-admin-page.php:241
+#: includes/stuart-admin-page.php:264
 msgid "Submit"
 msgstr "Guardar"
 
-#: includes/stuart-admin-page.php:38
+#: includes/stuart-admin-page.php:43
+msgid "Shipping fee"
+msgstr "Tarifa de envío"
+
+#: includes/stuart-admin-page.php:44
+msgid ""
+"Please indicate the price of the shipping costs according to the distance "
+"(in meters)."
+msgstr ""
+"Indique el precio de los gastos de envío en función de la distancia (en "
+"metros)."
+
+#: includes/stuart-admin-page.php:48 includes/stuart-admin-page.php:49
+msgid "< 1500 mts"
+msgstr "< 1500 mts"
+
+#: includes/stuart-admin-page.php:52 includes/stuart-admin-page.php:53
+msgid "> 1500 & < 3500 mts"
+msgstr "> 1500 & 3500 mts"
+
+#: includes/stuart-admin-page.php:56
+msgid "> 3500 mts"
+msgstr "> 3500 mts"
+
+#: includes/stuart-admin-page.php:57
+msgid "1 € each kilometer."
+msgstr "1 € cada kilometro."
+
+#: includes/stuart-admin-page.php:71
 msgid "Pick up data location"
 msgstr "Datos de localización de la recogida"
 
-#: includes/stuart-admin-page.php:39
+#: includes/stuart-admin-page.php:72
 msgid "Please, place here the pick up location"
 msgstr "Por favor, coloque aquí el lugar de recogida"
 
-#: includes/stuart-admin-page.php:43
+#: includes/stuart-admin-page.php:76
 msgid "Restaurant pick up address"
 msgstr "Dirección de recogida en el restaurante"
 
-#: includes/stuart-admin-page.php:49 includes/stuart-admin-page.php:50
+#: includes/stuart-admin-page.php:82 includes/stuart-admin-page.php:83
 msgid "First name"
 msgstr "Nombre"
 
-#: includes/stuart-admin-page.php:53 includes/stuart-admin-page.php:54
+#: includes/stuart-admin-page.php:86 includes/stuart-admin-page.php:87
 msgid "Last name"
 msgstr "Apellidos"
 
-#: includes/stuart-admin-page.php:58 includes/stuart-admin-page.php:59
+#: includes/stuart-admin-page.php:91 includes/stuart-admin-page.php:92
 msgid "Company"
 msgstr "Empresa"
 
-#: includes/stuart-admin-page.php:62 includes/stuart-admin-page.php:63
+#: includes/stuart-admin-page.php:95 includes/stuart-admin-page.php:96
 msgid "Email"
 msgstr "Email"
 
-#: includes/stuart-admin-page.php:68 includes/stuart-admin-page.php:69
-#: includes/stuart-admin-page.php:70 includes/stuart-admin-page.php:71
+#: includes/stuart-admin-page.php:101 includes/stuart-admin-page.php:102
+#: includes/stuart-admin-page.php:103 includes/stuart-admin-page.php:104
 msgid "Shop"
 msgstr "Tienda"
 
-#: includes/stuart-admin-page.php:77 includes/stuart-admin-page.php:91
-#: includes/stuart-admin-page.php:104 includes/stuart-admin-page.php:117
+#: includes/stuart-admin-page.php:110 includes/stuart-admin-page.php:125
+#: includes/stuart-admin-page.php:139 includes/stuart-admin-page.php:153
 msgid "Address It must be an address formatted by Google "
 msgstr "Debe ser una dirección formateada por Google "
 
-#: includes/stuart-admin-page.php:78
+#: includes/stuart-admin-page.php:111 includes/stuart-admin-page.php:126
+#: includes/stuart-admin-page.php:140 includes/stuart-admin-page.php:154
+msgid ""
+"Just street, number, pc, city and state and in that order. Other address "
+"info below, please!"
+msgstr ""
+"Sólo calle, número, PC, ciudad y estado y en ese orden. Otra información de "
+"la dirección abajo, ¡por favor!"
+
+#: includes/stuart-admin-page.php:112
 msgid "Enter a location shop 1"
 msgstr "Escribe la localización de la tienda 1"
 
-#: includes/stuart-admin-page.php:81 includes/stuart-admin-page.php:95
-#: includes/stuart-admin-page.php:108 includes/stuart-admin-page.php:121
-msgid "Phone"
-msgstr "Teléfono"
-
-#: includes/stuart-admin-page.php:82
-msgid "Phone shop 1"
-msgstr "Teléfono tienda 1"
-
-#: includes/stuart-admin-page.php:85 includes/stuart-admin-page.php:99
-#: includes/stuart-admin-page.php:112 includes/stuart-admin-page.php:125
+#: includes/stuart-admin-page.php:115 includes/stuart-admin-page.php:130
+#: includes/stuart-admin-page.php:144 includes/stuart-admin-page.php:158
 msgid ""
 "Add details for the courier (floor number, door, local, other information, "
 "etc.)"
@@ -164,67 +255,81 @@ msgstr ""
 "Añadir detalles para el mensajero (número de piso, puerta, local, otra "
 "información, etc.)"
 
-#: includes/stuart-admin-page.php:92
+#: includes/stuart-admin-page.php:119 includes/stuart-admin-page.php:134
+#: includes/stuart-admin-page.php:148 includes/stuart-admin-page.php:162
+msgid ""
+"The phone number should be in international number format (no leading zeros "
+"or + symbol should be used)."
+msgstr ""
+"El número de teléfono debe estar en formato de número internacional (no se "
+"deben utilizar ceros a la izquierda o + símbolo)."
+
+#: includes/stuart-admin-page.php:120
+msgid "Phone shop 1"
+msgstr "Teléfono tienda 1"
+
+#: includes/stuart-admin-page.php:127
 msgid "Enter location shop 2"
 msgstr "Escribe la localización de la tienda 2"
 
-#: includes/stuart-admin-page.php:96
+#: includes/stuart-admin-page.php:135
 msgid "Phone shop 2"
 msgstr "Teléfono tienda 2"
 
-#: includes/stuart-admin-page.php:105
+#: includes/stuart-admin-page.php:141
 msgid "Enter location shop 3"
 msgstr "Escribe la localización de la tienda 3"
 
-#: includes/stuart-admin-page.php:109
+#: includes/stuart-admin-page.php:149
 msgid "Phone shop 3"
 msgstr "Teléfono tienda 3"
 
-#: includes/stuart-admin-page.php:118
+#: includes/stuart-admin-page.php:155
 msgid "Enter location shop 4"
 msgstr "Escribe la localización de la tienda 4"
 
-#: includes/stuart-admin-page.php:122
+#: includes/stuart-admin-page.php:163
 msgid "Phone shop 4"
 msgstr "Teléfono tienda 4"
 
-#: includes/stuart-admin-page.php:142
+#: includes/stuart-admin-page.php:179
 msgid "Drop off data location"
 msgstr "Datos de localización de la entrega"
 
-#: includes/stuart-admin-page.php:146
+#: includes/stuart-admin-page.php:183
 msgid "Woocommerce Address"
 msgstr "Dirección de Woocommerce"
 
-#: includes/stuart-admin-page.php:152
+#: includes/stuart-admin-page.php:189
 msgid "Billing Address"
 msgstr "Dirección de facturación"
 
-#: includes/stuart-admin-page.php:153
+#: includes/stuart-admin-page.php:190
 msgid "Shipping Address"
 msgstr "Dirección de envío"
 
-#: includes/stuart-admin-page.php:167
+#: includes/stuart-admin-page.php:204
 msgid "GOOGLE API"
 msgstr "GOOGLE API"
 
-#: includes/stuart-admin-page.php:171
+#: includes/stuart-admin-page.php:208
 msgid "Please place here your Google API key"
 msgstr "Por favor, coloque aquí su clave de API de Google"
 
-#: includes/stuart-admin-page.php:175 includes/stuart-admin-page.php:198
+#: includes/stuart-admin-page.php:212 includes/stuart-admin-page.php:235
+#: includes/stuart-admin-page.php:258
 msgid "You can find here your "
 msgstr "Puedes encontrar aquí tu "
 
-#: includes/stuart-admin-page.php:175 includes/stuart-admin-page.php:177
+#: includes/stuart-admin-page.php:212 includes/stuart-admin-page.php:214
 msgid "Google API key"
 msgstr "Google API key"
 
-#: includes/stuart-admin-page.php:189
+#: includes/stuart-admin-page.php:226
 msgid "HERE MAPS API"
 msgstr "HERE MAPS API"
 
-#: includes/stuart-admin-page.php:190
+#: includes/stuart-admin-page.php:227
 msgid ""
 "Alternative to google maps to perform distance calculations between stores "
 "and calculate the shortest distance between the customer's address and the "
@@ -234,23 +339,59 @@ msgstr ""
 "tiendas y calcular la distancia más corta entre la dirección del cliente y "
 "la tienda que realizará el pedido"
 
-#: includes/stuart-admin-page.php:194
+#: includes/stuart-admin-page.php:231
 msgid "Please place here your HERE API key"
 msgstr "Por favor, coloque aquí su clave de API HERE"
 
-#: includes/stuart-admin-page.php:198 includes/stuart-admin-page.php:200
+#: includes/stuart-admin-page.php:235 includes/stuart-admin-page.php:237
 msgid "HERE API key"
 msgstr "HERE API key"
 
-#: includes/woo-functions.php:47
+#: includes/stuart-admin-page.php:249
+msgid "CLICKATELL API"
+msgstr "CLICKATELL API"
+
+#: includes/stuart-admin-page.php:250
+msgid "SMS provider for SMS notifications"
+msgstr "Proveedor de SMS para notificaciones por SMS"
+
+#: includes/stuart-admin-page.php:254
+msgid "Please place here your CLICKATELL API key"
+msgstr "Por favor, coloque aquí su clave de API CLICKATELL"
+
+#: includes/stuart-admin-page.php:258 includes/stuart-admin-page.php:260
+msgid "CLICKATELL API key"
+msgstr "Clave de API CLICKATELL"
+
+#: includes/woo-functions.php:45
+msgid "Stuart fail creating the delivery"
+msgstr "Fallo de Stuart creando la entrega"
+
+#: includes/woo-functions.php:46
 msgid "Stuart: "
 msgstr "Stuart: "
 
-#: includes/woo-functions.php:170
+#: includes/woo-functions.php:95
+msgid "The order ID is not a valid WooCommerce order"
+msgstr "El ID de pedido no es un pedido válido de WooCommerce"
+
+#: includes/woo-functions.php:99
+msgid "Order has been already refunded"
+msgstr "El pedido ya ha sido reembolsado"
+
+#: includes/woo-functions.php:254
 msgid "Shipping Fee"
 msgstr "Gastos de envío"
 
-#: includes/woo-functions.php:184
+#: includes/woo-functions.php:293
+msgid "Place Order"
+msgstr "Realizar pedido"
+
+#: includes/woo-functions.php:299
+msgid "My Account"
+msgstr "Mi cuenta"
+
+#: includes/woo-functions.php:310
 msgid "Stuart"
 msgstr "Stuart"
 
@@ -270,8 +411,11 @@ msgstr "Jabit Web Developer"
 msgid "https://ja-bit.com"
 msgstr "https://ja-bit.com"
 
-#~ msgid "Address"
-#~ msgstr "Dirección"
+#~ msgid "HEALTHY POKE ORDER"
+#~ msgstr "PEDIDO DE HEALTHY POKE"
+
+#~ msgid "Phone"
+#~ msgstr "Teléfono"
 
 #~ msgid "You do not have sufficient permissions to access this page."
 #~ msgstr "No tienes suficientes permisos para acceder a esta página."

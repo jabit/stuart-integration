@@ -37,7 +37,29 @@ function stuart_save_data() {
         update_option( 'stuart_api_key', $stuart_api_key );
         update_option( 'stuart_secret_key', $stuart_secret_key );
         update_option( 'stuart_environment', $stuart_environment );
-        add_flash_notice( __("Api Settings Saved"), "success", false );
+        add_flash_notice( __("Api Settings Saved", 'stuart-integration'), "success", false );
+        wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') ); // <-- here goes address of site that user should be redirected after submitting that form
+
+    }
+}
+
+//Save Shipping fee
+add_action( 'admin_post_nopriv_stuart_shipping_fee_save_data', 'stuart_shipping_fee_save_data' );
+add_action( 'admin_post_stuart_shipping_fee_save_data', 'stuart_shipping_fee_save_data' );
+
+function stuart_shipping_fee_save_data() {
+
+    $stuart_first_fee = null;
+    $stuart_second_fee = null;
+
+    if($_POST && $_POST['action'] == 'stuart_shipping_fee_save_data'){
+
+        $stuart_first_fee = $_POST['input_first_fee'];
+        $stuart_second_fee = $_POST['input_second_fee'];
+
+        update_option( 'stuart_first_fee', $stuart_first_fee );
+        update_option( 'stuart_second_fee', $stuart_second_fee );
+        add_flash_notice( __("Shipping Fee Settings Saved", 'stuart-integration'), "success", false );
         wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') ); // <-- here goes address of site that user should be redirected after submitting that form
 
     }
@@ -51,7 +73,7 @@ function stuart_save_google_key() {
     if(!empty($_POST['action']) && $_POST['action'] == 'stuart_save_google_key'){
 
         update_option( 'stuart_google_key', $_POST['stuart_google_api_key'] );
-        add_flash_notice( __("Google Api Settings Saved"), "success", false );
+        add_flash_notice( __("Google Api Settings Saved", 'stuart-integration'), "success", false );
         wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') );
     }
 }
@@ -65,26 +87,40 @@ function stuart_save_here_key() {
     if($_POST && $_POST['action'] == 'stuart_save_here_key'){
 
         update_option( 'stuart_here_key', $_POST['stuart_here_api_key'] );
-        add_flash_notice( __("HERE Api Settings Saved"), "success", false );
+        add_flash_notice( __("HERE Api Settings Saved", 'stuart-integration'), "success", false );
         wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') );
     }
 }
+
+//Clickatell key save
+add_action( 'admin_post_nopriv_stuart_save_clickatell_key', 'stuart_save_clickatell_key' );
+add_action( 'admin_post_stuart_save_clickatell_key', 'stuart_save_clickatell_key' );
+
+function stuart_save_clickatell_key() {
+
+    if($_POST && $_POST['action'] == 'stuart_save_clickatell_key'){
+
+        update_option( 'stuart_clickatell_key', $_POST['stuart_clickatell_api_key'] );
+        add_flash_notice( __("Clickatell Api Settings Saved", 'stuart-integration'), "success", false );
+        wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') );
+    }
+}
+
 
 //Save Stuart Pick up data
 add_action( 'admin_post_nopriv_stuart_save_pickup_data', 'stuart_save_pickup_data' );
 add_action( 'admin_post_stuart_save_pickup_data', 'stuart_save_pickup_data' );
 
+
 function stuart_save_pickup_data() {
 
-    if($_POST && $_POST['action'] == 'stuart_save_pickup_data'){
+    global $apiStuart;
+
+    if(!empty($_POST) && $_POST['action'] == 'stuart_save_pickup_data'){
 
         $pickup_first_name = $_POST['pickup_first_name'];
         $pickup_last_name = $_POST['pickup_last_name'];
         $pickup_company = $_POST['pickup_company'];
-        $pickup_address_1 = $_POST['pickup_address_1'];
-        $pickup_address_2 = $_POST['pickup_address_2'];
-        $pickup_address_3 = $_POST['pickup_address_3'];
-        $pickup_address_4 = $_POST['pickup_address_4'];
         $pickup_phone_1 = $_POST['pickup_phone_1'];
         $pickup_phone_2 = $_POST['pickup_phone_2'];
         $pickup_phone_3 = $_POST['pickup_phone_3'];
@@ -94,15 +130,37 @@ function stuart_save_pickup_data() {
         $stuart_pickup_details_2 = $_POST['stuart_pickup_details_2'];
         $stuart_pickup_details_3 = $_POST['stuart_pickup_details_3'];
         $stuart_pickup_details_4 = $_POST['stuart_pickup_details_4'];
+        $pickup_address_1 = $_POST['pickup_address_1'];
+        $pickup_address_2 = $_POST['pickup_address_2'];
+        $pickup_address_3 = $_POST['pickup_address_3'];
+        $pickup_address_4 = $_POST['pickup_address_4'];
 
-        if(!empty($_POST['action']) && $_POST['action'] == "stuart_save_pickup_data"){
-            update_option( 'pickup_first_name', $pickup_first_name );
-            update_option( 'pickup_last_name', $pickup_last_name );
-            update_option( 'pickup_company', $pickup_company );
+        $addressError = false;
+        $apiStuart = new ApiStuart();
+        if(!$apiStuart->validateAddress($pickup_address_1)['success']){
+            $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 1 address is for delivery out of range or incorrect", 'stuart-integration');
+        }
+        if(!$apiStuart->validateAddress($pickup_address_2)['success']){
+            $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 2 address is for delivery out of range or incorrect", 'stuart-integration');
+        }
+        if(!$apiStuart->validateAddress($pickup_address_3)['success']){
+            $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 3 address is for delivery out of range or incorrect", 'stuart-integration');
+        }
+        if(!$apiStuart->validateAddress($pickup_address_4)['success']){
+            $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 4 address is for delivery out of range or incorrect", 'stuart-integration');
+        }
+
+        if($addressError != false){
+            add_flash_notice( $addressError, "error", false );
+            wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') );
+        }else{
             update_option( 'pickup_address_1', $pickup_address_1 );
             update_option( 'pickup_address_2', $pickup_address_2 );
             update_option( 'pickup_address_3', $pickup_address_3 );
             update_option( 'pickup_address_4', $pickup_address_4 );
+            update_option( 'pickup_first_name', $pickup_first_name );
+            update_option( 'pickup_last_name', $pickup_last_name );
+            update_option( 'pickup_company', $pickup_company );
             update_option( 'pickup_phone_1', $pickup_phone_1 );
             update_option( 'pickup_phone_2', $pickup_phone_2 );
             update_option( 'pickup_phone_3', $pickup_phone_3 );
@@ -112,7 +170,7 @@ function stuart_save_pickup_data() {
             update_option( 'stuart_pickup_details_2', $stuart_pickup_details_2 );
             update_option( 'stuart_pickup_details_3', $stuart_pickup_details_3 );
             update_option( 'stuart_pickup_details_4', $stuart_pickup_details_4 );
-            add_flash_notice( __("Pick Up Settings Saved"), "success", false );
+            add_flash_notice( __("Pick Up Settings Saved", 'stuart-integration'), "success", false );
             wp_redirect( site_url('/wp-admin/admin.php?page=stuart-integration/includes/stuart-admin-page.php') );
         }
     }

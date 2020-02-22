@@ -3,7 +3,7 @@
 Plugin Name: Stuart WooCommerce integration
 Description: Stuart integration (express shipping) with woocommerce wordpress
 Author: Jabit Web Developer
-Version: 1.1.4
+Version: 1.1.5
 Author URI: https://ja-bit.com
 Text Domain: stuart-integration
 */
@@ -20,6 +20,9 @@ function stuart_activate()
     add_option( 'stuart_secret_key', '' );
     add_option( 'stuart_google_key', '' );
     add_option( 'stuart_here_key', '' );
+    add_option( 'stuart_clickatell_key', '' );
+    add_option( 'stuart_first_fee', '' );
+    add_option( 'stuart_second_fee', '' );
 
     //add pickup details
     add_option( 'pickup_first_name', null );
@@ -57,6 +60,9 @@ function stuart_plugin_uninstall() {
     get_option('stuart_secret_key') != false ? delete_option( 'stuart_secret_key' ) : "";
     get_option('stuart_google_key') != false ? delete_option( 'stuart_google_key' ) : "";
     get_option('stuart_here_key') != false ? delete_option( 'stuart_here_key' ) : "";
+    get_option('stuart_clickatell_key') != false ? delete_option( 'stuart_clickatell_key' ) : "";
+    get_option('stuart_first_fee') != false ? delete_option( 'stuart_first_fee' ) : "";
+    get_option('stuart_second_fee') != false ? delete_option( 'stuart_second_fee' ) : "";
 
     //delete pickup details
     get_option('pickup_first_name') != false ? delete_option( 'pickup_first_name' ) : "";
@@ -95,7 +101,10 @@ if (is_admin()) {
     add_action('admin_enqueue_scripts', "admin_enqueue_scripts");
 }
 
-function admin_enqueue_scripts(){
+function admin_enqueue_scripts($hook){
+
+    if( $hook != 'stuart-integration/includes/stuart-admin-page.php' )
+        return;
 
     wp_enqueue_style('bootstrap', plugins_url('css/bootstrap.css', __FILE__));
     wp_enqueue_style('stuart_admin_css', plugins_url('css/stuart-integration.css', __FILE__));
@@ -125,3 +134,10 @@ function stuart_plugin_locale($locale, $domain) {
     return $locale;
 }
 add_filter("plugin_locale", "stuart_plugin_locale", 10, 2);
+
+// PRADIÑAS Calle de Goya 12 28001
+// SANDOVAL Calle de la Palma 45, 28004 Madrid
+// TOLEDO Calle de Rodas 20, 28005 Madrid
+// Calle Tambre, 28 28002
+
+//.woocommerce-cart .wc-forward
