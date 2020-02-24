@@ -10,9 +10,7 @@ require_once plugin_dir_path(__FILE__) . 'apiStuart.php';
 global $apiStuart;
 $apiStuart = new ApiStuart();
 
-$result_check_pick_up = add_action( 'woocommerce_cart_calculate_fees','check_if_pick_up_shipping_methods' );
-
-if(!$result_check_pick_up) {
+if ( isset($_POST['shipping_method'][0]) && $_POST['shipping_method'][0] != 'wc_pickup_store' ) {
     if (!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret)) {
         add_action('woocommerce_checkout_order_processed', 'stuart_woocommerce_new_order');
         add_action('woocommerce_payment_complete', 'stuart_woocommerce_new_order_completed');
@@ -158,93 +156,79 @@ function stuart_session_start() {
 function stuart_session_end() {
     session_destroy();
 }
-//if(!$result_check_pick_up) {
-    if(!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->here_key) ||
-        !empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->google_key)){
 
-        //add_action( 'template_redirect', 'plugin_is_page_checkout' );
-        add_action('woocommerce_checkout_update_order_review', 'stuart_add_shipping_fee');
-        add_action( 'woocommerce_cart_calculate_fees','stuart_add_shipping_fee' );
-    }
-//}
-//woocommerce_view_order
+if(!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->here_key) ||
+    !empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->google_key)){
 
-/*
-function plugin_is_page_checkout() {
-    var_dump(is_page( 'checkout' ));
-    if (is_page( 'checkout' )) {
-        add_action('woocommerce_checkout_update_order_review', 'stuart_add_shipping_fee');
-    }else if(is_page('cart')){
-        add_action( 'woocommerce_cart_calculate_fees','stuart_add_shipping_fee' );
-    }
+    //add_action( 'template_redirect', 'plugin_is_page_checkout' );
+    add_action('woocommerce_checkout_update_order_review', 'stuart_add_shipping_fee');
+    add_action( 'woocommerce_cart_calculate_fees','stuart_add_shipping_fee' );
 }
-*/
+
 function stuart_add_shipping_fee( $posted_data ) {
 
-    global $woocommerce;
+    if ( isset($_POST['shipping_method'][0]) && $_POST['shipping_method'][0] != 'wc_pickup_store' ) {
 
-    if ( check_if_pick_up_shipping_methods() ) {
-        return;
-    }
+        global $woocommerce;
 
-    $closer = null;
-    $addressTo = null;
+        $closer = null;
+        $addressTo = null;
 
-    $post = false;
-    if(!isset($posted_data->cart_contents)){
-        $post = array();
-        $vars = explode('&', $posted_data);
-        foreach ($vars as $k => $value){
-            $v = explode('=', urldecode($value));
-            $post[$v[0]] = $v[1];
-        }
-    }
-
-    $apiStuart = new ApiStuart();
-    $addressTo = $apiStuart->stuart_get_address_to($post);
-
-    if(!$addressTo['success']){
-        wc_clear_notices();
-        if ( is_user_logged_in() && is_cart() && ! is_wc_endpoint_url() ) {
-            //remove_action( 'woocommerce_proceed_to_checkout','woocommerce_button_proceed_to_checkout', 20);
-            //add_action( 'woocommerce_cart_coupon', 'stuart_add_my_account_button' );
-            wc_add_notice(sprintf($addressTo['result']), 'notice');
-        }else if ( is_checkout() && ! is_wc_endpoint_url()  ) {
-            //add_action( 'woocommerce_review_order_before_submit', 'stuart_add_my_account_button' );
-            add_filter( 'woocommerce_order_button_html', 'replace_order_button_html', 10, 2 );
-            //add_action( 'woocommerce_before_checkout_form', 'stuart_shipping_notice' );
-            wc_add_notice(sprintf($addressTo['result']), 'notice');
-        }
-        return;
-
-    }else{
-
-        $closer = $apiStuart->calculate_closer_shop_from_drop_off($addressTo['result']);
-
-        if(!$closer['success']){
-            wc_add_notice( $closer['result'], 'notice' );
-            return;
-        }
-
-        $distance = $closer['result'];
-        // Set here your shipping fee amount
-        $fee = get_option('stuart_first_fee') != false ? get_option('stuart_first_fee') : 2.5; //< 1500
-
-        if ( is_admin() && ! defined( 'DOING_AJAX' ) )
-            return;
-
-        $difference = null;
-        if($distance > 1500 && $distance < 3500){
-            $fee = get_option('stuart_second_fee') != false ? get_option('stuart_second_fee') : 2.65;
-        }else if($distance >= 3500){
-            $difference = $distance - 3500;
-            if($difference > 1000){
-                $fee = get_option('stuart_second_fee') != false ? get_option('stuart_second_fee') : 2.65 + round($difference/1000, 0, PHP_ROUND_HALF_UP);
+        $post = false;
+        if(!isset($posted_data->cart_contents)){
+            $post = array();
+            $vars = explode('&', $posted_data);
+            foreach ($vars as $k => $value){
+                $v = explode('=', urldecode($value));
+                $post[$v[0]] = $v[1];
             }
         }
-        WC()->cart->add_fee( __('Shipping Fee', 'stuart-integration'), $fee, false );
-    }
 
+        $apiStuart = new ApiStuart();
+        $addressTo = $apiStuart->stuart_get_address_to($post);
+
+        if(!$addressTo['success']){
+            wc_clear_notices();
+            if ( is_user_logged_in() && is_cart() && ! is_wc_endpoint_url() ) {
+                //remove_action( 'woocommerce_proceed_to_checkout','woocommerce_button_proceed_to_checkout', 20);
+                //add_action( 'woocommerce_cart_coupon', 'stuart_add_my_account_button' );
+                wc_add_notice(sprintf($addressTo['result']), 'notice');
+            }else if ( is_checkout() && ! is_wc_endpoint_url()  ) {
+                //add_action( 'woocommerce_review_order_before_submit', 'stuart_add_my_account_button' );
+                add_filter( 'woocommerce_order_button_html', 'replace_order_button_html', 10, 2 );
+                //add_action( 'woocommerce_before_checkout_form', 'stuart_shipping_notice' );
+                wc_add_notice(sprintf($addressTo['result']), 'notice');
+            }
+            return;
+
+        }else{
+
+            $closer = $apiStuart->calculate_closer_shop_from_drop_off($addressTo['result']);
+
+            if(!$closer['success']){
+                wc_add_notice( $closer['result'], 'notice' );
+                return;
+            }
+
+            $distance = $closer['result'];
+            // Set here your shipping fee amount
+            $fee = get_option('stuart_first_fee') != false ? get_option('stuart_first_fee') : 2.5; //< 1500
+
+            if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+                return;
+
+            $difference = null;
+            if($distance > 1500 && $distance < 3500){
+                $fee = get_option('stuart_second_fee') != false ? get_option('stuart_second_fee') : 2.65;
+            }else if($distance >= 3500){
+                $difference = $distance - 3500;
+                if($difference > 1000){
+                    $fee = get_option('stuart_second_fee') != false ? get_option('stuart_second_fee') : 2.65 + round($difference/1000, 0, PHP_ROUND_HALF_UP);
+                }
+            }
+            WC()->cart->add_fee( __('Shipping Fee', 'stuart-integration'), $fee, false );
+        }
+    }
 }
 function stuart_shipping_notice() {
     echo '<ul class="woocommerce-error" role="alert"><li>'.__("This location is for delivery out of range or incorrect", 'stuart-integration').'</li></ul>';
@@ -313,6 +297,7 @@ function stuart_hide_shipping_when_free_is_available( $rates ) {
     return ! empty( $free ) ? $free : $rates;
 }
 
+/*
 function check_if_pick_up_shipping_methods() {
     global $woocommerce;
 
@@ -328,3 +313,4 @@ function check_if_pick_up_shipping_methods() {
     return false;
 
 }
+*/
