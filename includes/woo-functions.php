@@ -10,9 +10,13 @@ require_once plugin_dir_path(__FILE__) . 'apiStuart.php';
 global $apiStuart;
 $apiStuart = new ApiStuart();
 
-if(!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret)){
-    add_action( 'woocommerce_checkout_order_processed', 'stuart_woocommerce_new_order' );
-    add_action( 'woocommerce_payment_complete', 'stuart_woocommerce_new_order_completed' );
+$result_check_pick_up = add_action( 'woocommerce_cart_calculate_fees','check_if_pick_up_shipping_methods' );
+
+if(!$result_check_pick_up) {
+    if (!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret)) {
+        add_action('woocommerce_checkout_order_processed', 'stuart_woocommerce_new_order');
+        add_action('woocommerce_payment_complete', 'stuart_woocommerce_new_order_completed');
+    }
 }
 
 function stuart_woocommerce_new_order( $order_id ) {
@@ -109,18 +113,21 @@ function stuart_wc_refund_order( $order_id, $refund_reason = '' ) {
     if ( $order_items ) {
         foreach( $order_items as $item_id => $item ) {
 
-            $item_meta 	= $order->get_item_meta( $item_id );
-            $tax_data = $item_meta['_line_tax_data'];
+            //$item_meta 	= $order->get_item_meta( $item_id );
+            //$tax_data = $item_meta['_line_tax_data'];
+            $tax_data = $item->get_meta( '_line_tax_data' );
+            $total_data = $item->get_meta( '_line_total' );
             $refund_tax = 0;
             if( is_array( $tax_data[0] ) ) {
                 $refund_tax = array_map( 'wc_format_decimal', $tax_data[0] );
             }
 
-            $refund_amount = wc_format_decimal( $refund_amount ) + wc_format_decimal( $item_meta['_line_total'][0] );
+            $refund_amount = wc_format_decimal( $refund_amount ) + wc_format_decimal( $total_data[0] );
 
+            $qty_data = $item->get_meta( '_qty' );
             $line_items[ $item_id ] = array(
-                'qty' => $item_meta['_qty'][0],
-                'refund_total' => wc_format_decimal( $item_meta['_line_total'][0] ),
+                'qty' => $qty_data[0],
+                'refund_total' => wc_format_decimal( $total_data[0] ),
                 'refund_tax' =>  $refund_tax );
 
         }
@@ -136,28 +143,6 @@ function stuart_wc_refund_order( $order_id, $refund_reason = '' ) {
 
     return $refund;
 }
-/*
-function create_stuart_job_when_payment_completed( $order_id ) {
-
-    if ( !$order_id ) return;
-    $order = wc_get_order( $order_id );
-
-    $item_data_arr = null;
-    foreach ( $order->get_items() as $item ) {
-        $item_data_arr = $item->get_data();
-    }
-
-    //global $apiStuart;
-    //$apiStuart = new ApiStuart();
-    //$apiStuart->stuart_create_job($order, $item_data_arr);
-
-    //stuart_create_job($order, $item_data_arr);
-};
-if(!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret)){
-    // add the action
-    add_action( 'woocommerce_order_status_completed', 'create_stuart_job_when_payment_completed' );
-}
-*/
 
 //Session init
 add_action( 'init', 'stuart_session_start', 1 );
@@ -173,14 +158,16 @@ function stuart_session_start() {
 function stuart_session_end() {
     session_destroy();
 }
+//if(!$result_check_pick_up) {
+    if(!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->here_key) ||
+        !empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->google_key)){
 
-if(!empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->here_key) ||
-    !empty($apiStuart->stuart_key) && !empty($apiStuart->stuart_secret) && !empty($apiStuart->google_key)){
-
-    //add_action( 'template_redirect', 'plugin_is_page_checkout' );
-    add_action('woocommerce_checkout_update_order_review', 'stuart_add_shipping_fee');
-    add_action( 'woocommerce_cart_calculate_fees','stuart_add_shipping_fee' );
-}
+        //add_action( 'template_redirect', 'plugin_is_page_checkout' );
+        add_action('woocommerce_checkout_update_order_review', 'stuart_add_shipping_fee');
+        add_action( 'woocommerce_cart_calculate_fees','stuart_add_shipping_fee' );
+    }
+//}
+//woocommerce_view_order
 
 /*
 function plugin_is_page_checkout() {
@@ -195,6 +182,10 @@ function plugin_is_page_checkout() {
 function stuart_add_shipping_fee( $posted_data ) {
 
     global $woocommerce;
+
+    if ( check_if_pick_up_shipping_methods() ) {
+        return;
+    }
 
     $closer = null;
     $addressTo = null;
@@ -257,8 +248,6 @@ function stuart_add_shipping_fee( $posted_data ) {
 }
 function stuart_shipping_notice() {
     echo '<ul class="woocommerce-error" role="alert"><li>'.__("This location is for delivery out of range or incorrect", 'stuart-integration').'</li></ul>';
-
-    //echo '<p class="allow">Please allow 5-10 business days for delivery after order processing.</p>';
 }
 /*
 function stuart_woocommerce_checkout_update_order_review($posted_data){
@@ -322,4 +311,20 @@ function stuart_hide_shipping_when_free_is_available( $rates ) {
         }
     }
     return ! empty( $free ) ? $free : $rates;
+}
+
+function check_if_pick_up_shipping_methods() {
+    global $woocommerce;
+
+    if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+        return;
+
+    $chosen_methods = WC()->session->get( 'chosen_shipping_methods' );
+    $chosen_shipping = $chosen_methods[0];
+
+    if ( $chosen_shipping == 'local_pickup' ) {
+        return true;
+    }
+    return false;
+
 }
