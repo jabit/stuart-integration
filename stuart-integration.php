@@ -41,6 +41,7 @@ function stuart_activate()
     add_option( 'stuart_pickup_details_3', null );
     add_option( 'stuart_pickup_details_4', null );
     add_option( 'pickup_email', null );
+    add_option( 'stuart_pickup_closer', null );
     //add_option( 'stuart_dropoff_address', 'billing' );
     add_option( 'stuart_environment', 'sandbox' );
 
@@ -81,6 +82,7 @@ function stuart_plugin_uninstall() {
     get_option('stuart_pickup_details_3') != false ? delete_option( 'stuart_pickup_details_3' ) : "";
     get_option('stuart_pickup_details_4') != false ? delete_option( 'stuart_pickup_details_4' ) : "";
     get_option('pickup_email') != false ? delete_option( 'pickup_email' ) : "";
+    get_option('stuart_pickup_closer') != false ? delete_option( 'stuart_pickup_closer' ) : "";
     get_option('stuart_environment') != false ? delete_option( 'stuart_environment' ) : "";
 }
 register_uninstall_hook( __FILE__, 'stuart_plugin_uninstall' );

@@ -32,9 +32,26 @@ class ApiStuart
         $this->google_key = get_option('stuart_google_key');
     }
 
-    public function stuart_create_job($order_id){
+    public function stuart_create_job($order_id, $closer=null){
 
         if ( !$order_id ) return;
+
+        if ( empty($closer) ){
+            $closer = get_option( 'stuart_pickup_closer');
+        }
+            /*
+        if ( !isset($_SESSION['pickup_closer']) && empty($_SESSION['pickup_closer']) ){
+            $closer = get_option( 'stuart_pickup_closer');
+            if ( empty($closer) ){
+                return array(
+                    'success' => false,
+                    'result' => __('No pickup closer shop find', 'stuart-integration')
+                );
+            }
+        }else{
+            $closer = $_SESSION['pickup_closer'];
+        }*/
+
         $order = wc_get_order( $order_id );
 
         $pickupAt = null;
@@ -46,12 +63,12 @@ class ApiStuart
         $this->job = new \Stuart\Job();
 
         //pick up
-        $this->job->addPickup(get_option('pickup_address_'.$_SESSION['pickup_closer']))
-            ->setComment(get_option( 'stuart_pickup_details_'.$_SESSION['pickup_closer']))
+        $this->job->addPickup(get_option('pickup_address_'.$closer))
+            ->setComment(get_option( 'stuart_pickup_details_'.$closer))
             ->setContactCompany(get_option( 'pickup_company'))
             ->setContactFirstName(get_option( 'pickup_first_name'))
             ->setContactLastName(get_option( 'pickup_last_name'))
-            ->setContactPhone(get_option( 'pickup_phone_'.$_SESSION['pickup_closer'] ))
+            ->setContactPhone(get_option( 'pickup_phone_'.$closer ))
             ->setContactEmail(get_option( 'pickup_email'))
             ->setPickupAt($pickupAt);
 
@@ -74,12 +91,13 @@ class ApiStuart
         $item_data .= __('LINK TO WOO ORDER', 'stuart-integration').': '.admin_url('post.php?post='.$order_id.'&action=edit');
         $item_data .= " | ";
         $item_data .= __('SHOP ORDER', 'stuart-integration').': ';
-        foreach ( $order->get_items() as $key => $item ) {
 
+        foreach ( $order->get_items() as $key => $item ) {
+            $data = $item->get_data();
             if(end($order->get_items()) == $item){
-                $item_data .= $item->get_data()['quantity'].' x '.$item->get_data()['name'].PHP_EOL;
+                $item_data .= $data['quantity'].' x '.$data['name'].PHP_EOL;
             }else{
-                $item_data .= $item->get_data()['quantity'].' x '.$item->get_data()['name'].', '.PHP_EOL;
+                $item_data .= $data['quantity'].' x '.$data['name'].', '.PHP_EOL;
             }
         }
 
@@ -97,14 +115,22 @@ class ApiStuart
 
         $result = $this->client->validateJob($this->job);
 
+        $resultJob = false;
         if(isset($result->error) && !empty($result->error)){
             //TODO cancelar pedido y pago???
             $order->update_status( 'failed' );
-        }else{
-            $this->client->createJob($this->job);
+            return array(
+                'success' => false,
+                'result' => __($result->error, 'stuart-integration')
+            );
         }
 
-        return $result;
+        $resultJob = $this->client->createJob($this->job);
+        update_option( 'stuart_pickup_closer', '' );
+        return array(
+            'success' => true,
+            'result' => $resultJob->getId()
+        );
     }
 
     public function splitString($cadena, $longitud) {
@@ -131,11 +157,21 @@ class ApiStuart
 
     public function formatted_shipping_address($order)
     {
-        return $order->get_shipping_address_1() . ', ' .
-            //$order->get_shipping_address_2() . ' ' .
-            $order->get_shipping_postcode()  . ', ' .
-            $order->get_shipping_city()     . ' ' .
-            $order->get_shipping_state();
+
+        if(!empty($order->get_shipping_address_1())){
+            return $order->get_shipping_address_1() . ', ' .
+                //$order->get_shipping_address_2() . ' ' .
+                $order->get_shipping_postcode()  . ', ' .
+                $order->get_shipping_city()     . ' ' .
+                $order->get_shipping_state();
+        }else{
+            return $order->get_billing_address_1() . ', ' .
+                //$order->get_shipping_address_2() . ' ' .
+                $order->get_billing_postcode()  . ', ' .
+                $order->get_billing_city()     . ' ' .
+                $order->get_billing_state();
+        }
+
     }
 
     public function stuart_validation($order_id) {
@@ -144,14 +180,21 @@ class ApiStuart
         if ( !$order_id ) return;
         $order = wc_get_order( $order_id );
 
-        $addressTo = $woocommerce->customer->get_shipping_address_1() . ', ' .
-            //$woocommerce->customer->get_shipping_address_2() . ' ' .
-            $woocommerce->customer->get_shipping_postcode()  . ', ' .
-            $woocommerce->customer->get_shipping_city()     . ' ' .
-            $woocommerce->customer->get_shipping_state();
+        if(!empty($woocommerce->customer->get_shipping_address_1())){
+            $addressTo = $woocommerce->customer->get_shipping_address_1() . ', ' .
+                $woocommerce->customer->get_shipping_postcode()  . ', ' .
+                $woocommerce->customer->get_shipping_city()     . ' ' .
+                $woocommerce->customer->get_shipping_state();
+        }else{
+            $addressTo = $woocommerce->customer->get_billing_address_1() . ', ' .
+                $woocommerce->customer->get_billing_postcode()  . ', ' .
+                $woocommerce->customer->get_billing_city()     . ' ' .
+                $woocommerce->customer->get_billing_state();
+        }
 
         //Validar direcciones
         $validateAddress = $this->httpClient->performGet('/v2/addresses/validate', ['address' => $addressTo, 'type' => 'delivering']);
+
 
         if(!$validateAddress->success()){
             //return $validateAddress;
@@ -162,6 +205,7 @@ class ApiStuart
         }
 
         $resultCloser = $this->calculate_closer_shop_from_drop_off($addressTo);
+        update_option( 'stuart_pickup_closer', $resultCloser['address'] );
 
         if(!$resultCloser['success']){
             return array(
@@ -189,6 +233,8 @@ class ApiStuart
 
         $result = $this->client->validateJob($this->job);
 
+        //error_log("este es el resultado de stuart $result");
+
         if(!empty($result->error)){
             //TODO cancelar pedido y pago
             $order->update_status( 'failed' );
@@ -196,12 +242,20 @@ class ApiStuart
                 'success' => false,
                 'result' => __($result->message, 'stuart-integration')
             );
+        }else{
+            return array(
+                'success' => true,
+                'result' => __('Stuart validation success', 'stuart-integration'),
+                'closer' => $resultCloser['address']
+            );
         }
 
+        /*
         return array(
             'success' => true,
             'result' => __($result->message, 'stuart-integration')
         );
+        */
     }
 
     public function stuart_address_validation_without_order_id($address) {
@@ -269,7 +323,8 @@ class ApiStuart
         $latAdressTo = null;
         $lonAdressFrom = null;
         $latAdressFrom = null;
-        $_SESSION['pickup_closer'] = null;
+
+        $closer = false;
 
         //TODO calculate the distance between all the shops
         for($i=1;$i<=4;$i++){
@@ -277,38 +332,40 @@ class ApiStuart
                 $addressesFrom[$i] = get_option( 'pickup_address_'.$i);
         }
 
-        if(!empty($this->here_key)){
+        if(!empty($addressesFrom)){
 
-            //Calculate distance with HERE;
-            foreach($addressesFrom as $key => $addressFrom){
-                $addressValidate = $this->validateAddress($addressFrom);
-                if(isset($addressValidate['success']) && $addressValidate['success']){
-                    $calculateDistance[$key] = $this->getHereDistance($addressFrom, $addressTo);
-                    if(!is_numeric($calculateDistance[$key])){
-                        return array(
-                            'success' => false,
-                            'result' => __($calculateDistance[$key], 'stuart-integration')
-                        );
+            if(!empty($this->here_key)){
+
+                //Calculate distance with HERE;
+                foreach($addressesFrom as $key => $addressFrom){
+                    $addressValidate = $this->validateAddress($addressFrom);
+                    if(isset($addressValidate['success']) && $addressValidate['success']){
+                        $calculateDistance[$key] = $this->getHereDistance($addressFrom, $addressTo);
+                        if(!is_numeric($calculateDistance[$key])){
+                            return array(
+                                'success' => false,
+                                'result' => __($calculateDistance[$key], 'stuart-integration')
+                            );
+                        }
+                    }
+                }
+            }else{
+                //Calculate distance with GOOGLE;
+                foreach($addressesFrom as $key => $addressFrom){
+                    $addressValidate = $this->validateAddress($addressFrom);
+                    if(isset($addressValidate['success']) && $addressValidate['success']){
+                        $calculateDistance[$key] = $this->getGoogleDistance($addressFrom, $addressTo, "K");
+                        if(!is_numeric($calculateDistance[$key])){
+                            return array(
+                                'success' => false,
+                                'result' => __($calculateDistance[$key], 'stuart-integration')
+                            );
+                        }
                     }
                 }
             }
-        }else{
-            //Calculate distance with GOOGLE;
-            foreach($addressesFrom as $key => $addressFrom){
-                $addressValidate = $this->validateAddress($addressFrom);
-                if(isset($addressValidate['success']) && $addressValidate['success']){
-                    $calculateDistance[$key] = $this->getGoogleDistance($addressFrom, $addressTo, "K");
-                    if(!is_numeric($calculateDistance[$key])){
-                        return array(
-                            'success' => false,
-                            'result' => __($calculateDistance[$key], 'stuart-integration')
-                        );
-                    }
-                }
-            }
+            $closer = min($calculateDistance);
         }
-
-        $closer = min($calculateDistance);
 
         if(!$closer){
             return array(
@@ -318,7 +375,6 @@ class ApiStuart
         }
 
         $addressNum = array_search($closer, $calculateDistance);
-        $_SESSION['pickup_closer'] = $addressNum;
 
         return array(
             'success' => true,
@@ -351,24 +407,22 @@ class ApiStuart
 
         $addressTo = null;
 
-        if($address){
-            $ship = 'billing';
-            if(isset($address['ship_to_different_address']) && $address['ship_to_different_address']){
-                $ship = 'shipping';
-            }
-            $addressTo =  $address[$ship.'_address_1'] . ', ' .
-                $address[$ship.'_postcode']  . ', ' .
-                $address[$ship.'_city']     . ' ' .
-                $address[$ship.'_state'];
-        }else{
+        if(!empty($woocommerce->customer->get_shipping_address_1())){
             $addressTo = $woocommerce->customer->get_shipping_address_1() . ', ' .
                 $woocommerce->customer->get_shipping_postcode()  . ', ' .
                 $woocommerce->customer->get_shipping_city()     . ' ' .
                 $woocommerce->customer->get_shipping_state();
+        }else{
+            $addressTo = $woocommerce->customer->get_billing_address_1() . ', ' .
+                $woocommerce->customer->get_billing_postcode()  . ', ' .
+                $woocommerce->customer->get_billing_city()     . ' ' .
+                $woocommerce->customer->get_billing_state();
         }
+
 
         //Validar direcciones
         $validateAddress = $this->httpClient->performGet('/v2/addresses/validate', ['address' => $addressTo, 'type' => 'delivering']);
+
 
         if(!$validateAddress->success()){
             return array(
