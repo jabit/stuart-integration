@@ -137,16 +137,16 @@ function stuart_save_pickup_data() {
 
         $addressError = false;
         $apiStuart = new ApiStuart();
-        if(!$apiStuart->validateAddress($pickup_address_1)['success']){
+        if(!empty($pickup_address_1) && !$apiStuart->validateAddress($pickup_address_1)['success']){
             $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 1 address is for delivery out of range or incorrect", 'stuart-integration');
         }
-        if(!$apiStuart->validateAddress($pickup_address_2)['success']){
+        if(!empty($pickup_address_2) && !$apiStuart->validateAddress($pickup_address_2)['success']){
             $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 2 address is for delivery out of range or incorrect", 'stuart-integration');
         }
-        if(!$apiStuart->validateAddress($pickup_address_3)['success']){
+        if(!empty($pickup_address_3) && !$apiStuart->validateAddress($pickup_address_3)['success']){
             $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 3 address is for delivery out of range or incorrect", 'stuart-integration');
         }
-        if(!$apiStuart->validateAddress($pickup_address_4)['success']){
+        if(!empty($pickup_address_4) && !$apiStuart->validateAddress($pickup_address_4)['success']){
             $addressError = __("NOT SAVED", 'stuart-integration').': '.__("Pick Up Shop 4 address is for delivery out of range or incorrect", 'stuart-integration');
         }
 

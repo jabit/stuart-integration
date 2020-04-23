@@ -233,20 +233,35 @@ function stuart_add_shipping_fee( $posted_data ) {
             return;
         }
 
+        if ( is_admin() && ! defined( 'DOING_AJAX' ) )
+            return;
+
         $distance = $closer['result'];
         // Set here your shipping fee amount
-        $fee = get_option('stuart_first_fee') != false ? get_option('stuart_first_fee') : 2.5; //< 1500
 
-        $difference = null;
-        if($distance > 1500 && $distance < 3500){
-            $fee = get_option('stuart_second_fee') != false ? get_option('stuart_second_fee') : 2.65;
-        }else if($distance >= 3500){
-            $difference = $distance - 3500;
-            if($difference > 1000){
-                $fee = get_option('stuart_second_fee') != false ? get_option('stuart_second_fee') : 2.65 + round($difference/1000, 0, PHP_ROUND_HALF_UP);
-            }
+        $default_first_fee = 0;
+        if(!empty(get_option('stuart_first_fee')) && get_option('stuart_first_fee') > 0){
+            $default_first_fee = get_option('stuart_first_fee');
+        }
+        $default_second_fee = 0;
+        if(!empty(get_option('stuart_second_fee')) && get_option('stuart_second_fee') > 0){
+            $default_second_fee = get_option('stuart_second_fee');
         }
 
+        $fee = 0;
+        if($default_first_fee > 0 && $default_second_fee > 0){
+            $fee = $default_first_fee; //< 1500
+
+            $difference = null;
+            if($distance > 1500 && $distance < 3500){ //> 1500 < 3500
+                $fee = $default_second_fee;
+            }else if($distance >= 3500){ // > 3500
+                $difference = $distance - 3500;
+                if($difference > 1000){
+                    $fee = $default_second_fee + round($difference/1000, 0, PHP_ROUND_HALF_UP);
+                }
+            }
+        }
 
         //$woocommerce->cart->add_fee( __('Shipping Fee', 'stuart-integration'), $fee, false );
         $woocommerce->cart->add_fee( __('Shipping Fee', 'stuart-integration'), $fee, false );
